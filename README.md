@@ -7,6 +7,9 @@ This is a simple **Kotlin CookBook** that helps you learn Kotlin **easier** and 
 
 Each "recipe" is a small Kotlin program that teaches you one concept at a time.
 
+>[!IMPORTANT]
+>This repo is still incomplete and I just learning Kotlin now,so if you can,please help me to complete by **fork** and add new **recipes**
+
 ## Who can use it?
 **Everyone!** Whether you're a:
 - 🍝 **Beginner** – just starting your coding journey
@@ -25,8 +28,8 @@ Each "recipe" is a small Kotlin program that teaches you one concept at a time.
 
 ```bash
 # Clone the kitchen
-git clone https://github.com/realmg51-cpu/HelloAndroid
-cd HelloAndroid
+git clone https://github.com/realmg51-cpu/KotlinCookBook
+cd KotlinCookBook
 
 # Run a recipe
 kotlin src/kotlin/normal/HelloWorld.kt
