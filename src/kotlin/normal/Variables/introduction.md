@@ -124,5 +124,4 @@ Remember:
 
 Happy cooking! 👨‍🍳
 
-
-
+[👉 Introduction to work with variables](src/kotlin/normal/Variables/Work with it/introduction.md)
