@@ -275,7 +275,7 @@ This makes your code read like English:
 
 Now you can make decisions with `if` and Booleans. Next, we'll learn about **`when`** – the spice rack that makes multiple choices cleaner and more delicious!
 
-👉 [The Spice Rack: When Expression](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/IfChef/introduction.md)
+👉 [The Spice Rack: When Expression](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/WhenChef/introduction.md)
 
 ---
 
