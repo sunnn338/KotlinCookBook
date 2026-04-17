@@ -1,0 +1,66 @@
+name: 🧪 Test Kotlin Kitchen
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Cho phép chạy thủ công từ GitHub UI
+
+jobs:
+  test-all-recipes:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🍴 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: ☕ Setup Kotlin
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: 🏗️ Install Kotlin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y kotlin
+      
+      - name: 📋 Find all Kotlin files
+        id: find_files
+        run: |
+          echo "files=$(find src -name "*.kt" -type f | tr '\n' ' ')" >> $GITHUB_OUTPUT
+      
+      - name: 🧪 Test each recipe
+        run: |
+          echo "🧪 Starting kitchen tests..."
+          echo ""
+          
+          FAILED=0
+          TOTAL=0
+          
+          for file in $(find src -name "*.kt" -type f); do
+            TOTAL=$((TOTAL + 1))
+            echo "🔪 Testing: $file"
+            
+            if kotlin "$file" > /tmp/output.txt 2>&1; then
+              echo "   ✅ PASSED"
+            else
+              echo "   ❌ FAILED"
+              echo "   📜 Output:"
+              cat /tmp/output.txt | sed 's/^/      /'
+              FAILED=$((FAILED + 1))
+            fi
+            echo ""
+          done
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Results: $((TOTAL - FAILED))/$TOTAL passed"
+          
+          if [ $FAILED -ne 0 ]; then
+            echo "❌ $FAILED recipe(s) failed!"
+            exit 1
+          else
+            echo "🎉 All recipes passed! Bon appétit!"
+            exit 0
+          fi
