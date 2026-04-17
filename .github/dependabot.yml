@@ -1,0 +1,27 @@
+# Dependabot configuration for Kotlin CookBook 🍳
+# Checks for outdated GitHub Actions daily at 6 AM
+
+version: 2
+updates:
+  # Check GitHub Actions for updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "Asia/Ho_Chi_Minh"  # UTC+7 (Việt Nam)
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci"
+      prefix-development: "ci"
+      include: "scope"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "realmg51-cpu"  # Your GitHub username
+    # Optional: Group all action updates into one PR
+    groups:
+      github-actions:
+        patterns:
+          - "*"
