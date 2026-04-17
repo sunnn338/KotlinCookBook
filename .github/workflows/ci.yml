@@ -27,8 +27,6 @@ jobs:
         with:
           path: ~/kotlinc
           key: ${{ runner.os }}-kotlin-2.0.20
-          restore-keys: |
-            ${{ runner.os }}-kotlin-
       
       - name: 🏗️ Install Kotlin (cached)
         if: steps.cache-kotlin.outputs.cache-hit != 'true'
@@ -39,15 +37,9 @@ jobs:
       
       - name: 🔗 Add Kotlin to PATH
         run: |
-          echo "${{ github.workspace }}/kotlinc/bin" >> $GITHUB_PATH
-          echo "~/kotlinc/bin" >> $GITHUB_PATH
+          echo "$HOME/kotlinc/bin" >> $GITHUB_PATH
       
-      - name: ✅ Verify Kotlin installation
-        run: |
-          kotlinc -version
-          echo "Kotlin is ready! 🚀"
-      
-      - name: 🧪 Test each recipe
+      - name: 🧪 Test each recipe (compile + run)
         run: |
           echo "🧪 Starting kitchen tests..."
           echo ""
@@ -59,13 +51,27 @@ jobs:
             TOTAL=$((TOTAL + 1))
             echo "🔪 Testing: $file"
             
-            # Chạy file Kotlin bằng script mode
-            if kotlinc -script "$file" > /tmp/output.txt 2>&1; then
-              echo "   ✅ PASSED"
+            # Lấy tên file không có extension
+            filename=$(basename "$file" .kt)
+            dir=$(dirname "$file")
+            
+            # Compile file Kotlin
+            if kotlinc "$file" -include-runtime -d "$dir/$filename.jar" 2>/tmp/compile_error.txt; then
+              # Chạy file đã compile
+              if java -jar "$dir/$filename.jar" > /tmp/output.txt 2>&1; then
+                echo "   ✅ PASSED"
+              else
+                echo "   ❌ FAILED (runtime error)"
+                echo "   📜 Output:"
+                cat /tmp/output.txt | sed 's/^/      /'
+                FAILED=$((FAILED + 1))
+              fi
+              # Dọn dẹp file jar sau khi test
+              rm -f "$dir/$filename.jar"
             else
-              echo "   ❌ FAILED"
-              echo "   📜 Output:"
-              cat /tmp/output.txt | sed 's/^/      /'
+              echo "   ❌ FAILED (compilation error)"
+              echo "   📜 Error:"
+              cat /tmp/compile_error.txt | sed 's/^/      /'
               FAILED=$((FAILED + 1))
             fi
             echo ""
