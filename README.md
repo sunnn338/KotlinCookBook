@@ -1,6 +1,8 @@
 
 # Kotlin CookBook 🍳
 
+[![🧪 Test Kotlin Kitchen](https://github.com/realmg51-cpu/KotlinCookBook/actions/workflows/ci.yml/badge.svg)](https://github.com/realmg51-cpu/KotlinCookBook/actions/workflows/ci.yml)
+
 > *"Learn Kotlin the fun way – one recipe at a time!"*
 
 ## What is it?
