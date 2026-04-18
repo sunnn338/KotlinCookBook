@@ -328,7 +328,7 @@ val result = when (value) {
 
 Now you can make complex decisions cleanly with `when`. Next, we'll learn about **loops** – doing things repeatedly without writing the same code 100 times!
 
-👉 [Loops: The Automatic Stirrer](src/kotlin/normal/Loops/introduction.md)
+👉 [For Loop: The Automatic Stirrer](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Loops/For/introduction.md)
 
 ---
 
