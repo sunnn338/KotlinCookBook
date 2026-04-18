@@ -208,87 +208,225 @@ Print the multiplication table for 5:
 5 x 10 = 50
 ```
 
+<details>
+<summary>🐞 Hidden Bug</summary>
+
+**Bug:** Forgetting to handle negative numbers or zero
+```kotlin
+// ❌ Wrong: If number = 0, nothing prints
+for (i in 1..number) { ... }
+
+// ✅ Correct: Check edge cases
+if (number <= 0) {
+    println("Please enter a positive number")
+    return
+}
+```
+</details>
+
+---
+
 ### Challenge 2: Sum of Numbers
-Calculate the sum of all numbers from 1 to 100.
-*Hint: Create a `var total = 0` and add each number*
+Calculate the sum of all numbers from 1 to 100. (Answer: 5050)
+
+<details>
+<summary>🐞 Hidden Bug</summary>
+
+**Bug:** Forgetting to initialize `total = 0`
+```kotlin
+// ❌ Wrong: total not initialized
+var total
+for (i in 1..100) {
+    total += i  // ERROR!
+}
+
+// ✅ Correct: Always initialize counter
+var total = 0  // ← Important!
+for (i in 1..100) {
+    total += i
+}
+println("Total: $total")  // 5050
+```
+</details>
+
+---
 
 ### Challenge 3: Even Numbers Only
 Print all even numbers from 1 to 20.
-*Hint: Use `step 2` or check `if (i % 2 == 0)`*
+
+<details>
+<summary>🐞 Hidden Bug</summary>
+
+**Bug 1:** Using `step 1` + checking `% 2` is slower
+```kotlin
+// ❌ Slower (runs 20 times, checks 20 times)
+for (i in 1..20) {
+    if (i % 2 == 0) print("$i ")
+}
+
+// ✅ Faster (runs only 10 times, no check needed)
+for (i in 2..20 step 2) {
+    print("$i ")
+}
+// Output: 2 4 6 8 10 12 14 16 18 20
+```
+
+**Bug 2:** Wrong use of `until`
+```kotlin
+// ❌ Wrong: 20 is NOT printed
+for (i in 2 until 20 step 2) { ... }
+
+// ✅ Correct: Use .. to include 20
+for (i in 2..20 step 2) { ... }
+```
+</details>
+
+---
 
 ### Challenge 4: FizzBuzz (Classic!)
 Print numbers 1 to 30. But:
 - Multiple of 3 → print "Fizz"
 - Multiple of 5 → print "Buzz"  
-- Multiple of both → print "FizzBuzz"
+- Multiple of **both** → print "FizzBuzz"
 - Otherwise → print the number
+
+<details>
+<summary>🐞 Hidden Bug</summary>
+
+**Bug:** Wrong order – checking 3 and 5 first
+```kotlin
+// ❌ WRONG: 15 will print "Fizz" (checks 3 first)
+for (i in 1..30) {
+    if (i % 3 == 0) println("Fizz")
+    else if (i % 5 == 0) println("Buzz")
+    else if (i % 15 == 0) println("FizzBuzz")  // Never runs!
+    else println(i)
+}
+
+// ✅ CORRECT: Check 15 (both) FIRST
+for (i in 1..30) {
+    when {
+        i % 15 == 0 -> println("FizzBuzz")  // Check both FIRST!
+        i % 3 == 0 -> println("Fizz")
+        i % 5 == 0 -> println("Buzz")
+        else -> println(i)
+    }
+}
+```
+
+**Expected output:**
+```
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz  ← If order is wrong, this prints "Fizz"
+...
+```
+</details>
+
+---
 
 ### Challenge 5: Reverse a String
 Ask user for a word and print it backwards.
-*Hint: Loop from `word.length - 1` down to `0`*
+*Example: "Kotlin" → "nilt oK"*
+
+<details>
+<summary>🐞 Hidden Bug</summary>
+
+**Bug:** `readln()` can throw exception on EOF (Ctrl+D)
+```kotlin
+// ❌ May throw exception on EOF
+val word = readln()
+val reversed = word.reversed()
+println(reversed)
+
+// ✅ Safer: Use readlnOrNull()
+val word = readlnOrNull()
+if (word.isNullOrEmpty()) {
+    println("No input provided!")
+    return
+}
+val reversed = word.reversed()
+println(reversed)
+
+// ✅ Manual reverse (without .reversed())
+fun reverseString(str: String): String {
+    var result = ""
+    for (i in str.length - 1 downTo 0) {
+        result += str[i]
+    }
+    return result
+}
+```
+</details>
 
 ---
 
-## 📊 Quick Reference
+### Challenge 6: Prime Number Checker (Bonus!)
+Check if a number is prime.
 
-| You want to... | Use this |
-|----------------|----------|
-| Loop through numbers | `for (i in 1..10)` |
-| Loop excluding last | `for (i in 1 until 10)` |
-| Loop with step | `for (i in 1..10 step 2)` |
-| Count down | `for (i in 10 downTo 1)` |
-| Loop through list | `for (item in list)` |
-| Loop with index and value | `for ((i, item) in list.withIndex())` |
-| Loop by index position | `for (i in list.indices)` |
-| Loop through string | `for (char in "text")` |
+<details>
+<summary>🐞 Hidden Bug</summary>
+
+**Bug:** Forgetting to handle 1 and negative numbers
+```kotlin
+// ❌ Wrong: 1 is NOT a prime number
+fun isPrime(n: Int): Boolean {
+    for (i in 2 until n) {
+        if (n % i == 0) return false
+    }
+    return true  // n=1 → true (WRONG!)
+}
+
+// ✅ Correct: Handle edge cases
+fun isPrime(n: Int): Boolean {
+    if (n <= 1) return false
+    if (n == 2) return true
+    if (n % 2 == 0) return false
+    
+    // Only need to check up to sqrt(n)
+    for (i in 3..Math.sqrt(n.toDouble()).toInt() step 2) {
+        if (n % i == 0) return false
+    }
+    return true
+}
+```
+</details>
 
 ---
 
-## 🔥 Chef's Tips
+## 📊 Hidden Bugs Summary
 
-### Tip 1: Use meaningful variable names
+| Challenge | Hidden Bug | Fix |
+|-----------|-----------|-----|
+| **Challenge 2** | Forgot to initialize `total = 0` | `var total = 0` |
+| **Challenge 3** | Using `step 1` + `% 2` check (slower) | Use `step 2` for performance |
+| **Challenge 4** | Wrong order (checking 3 & 5 first) | Check `% 15 == 0` first |
+| **Challenge 5** | `readln()` may throw exception | Use `readlnOrNull()` + null check |
+| **Challenge 6** | Forgot to handle 1 and negative numbers | `if (n <= 1) return false` |
+
+---
+
+## 🔥 Chef's Warning
+
+> **"Code that runs is not necessarily code that's correct. Always test edge cases!"**
+
 ```kotlin
-// ❌ Not clear
-for (x in 1..10) { ... }
-
-// ✅ Clear
-for (batch in 1..10) { ... }
-for (ingredient in shoppingList) { ... }
-```
-
-### Tip 2: Prefer `until` when excluding the last
-```kotlin
-// If you want 1, 2, 3, 4 (not 5)
-for (i in 1 until 5)  // Clearer than 1..4
-```
-
-### Tip 3: Don't repeat yourself
-```kotlin
-// ❌ Don't do this (copy-paste)
-println("Stir 1")
-println("Stir 2")
-println("Stir 3")
-// ... 97 more times!
-
-// ✅ Do this (use a loop)
-for (i in 1..100) {
-    println("Stir $i")
-}
-```
-
-### Tip 4: `forEach` alternative (functional style)
-```kotlin
-val items = listOf("🍎", "🍐", "🍊")
-
-// Traditional for loop
-for (item in items) {
-    println(item)
-}
-
-// Functional style (same result)
-items.forEach { item ->
-    println(item)
-}
+// Always ask 3 questions when writing loops:
+// 1. Is the counter initialized?
+// 2. Is the stop condition correct?
+// 3. Are edge cases (0, 1, empty, null) handled?
 ```
 
 ---
@@ -298,20 +436,6 @@ items.forEach { item ->
 Now you can repeat tasks automatically! Next, learn about **`while` loops** – keep stirring until the soup is ready!
 
 👉 [While Loops: Keep Going Until Done](src/kotlin/normal/Loops/WhileStirring.md)
-
----
-
-## 🧂 Summary
-
-| Concept | Kitchen Analogy |
-|---------|-----------------|
-| **For loop** | Automatic stirrer |
-| **Range (`..`)** | "Do this 5 times" |
-| **`until`** | "Do this but stop before..." |
-| **`step`** | "Skip every other stir" |
-| **`downTo`** | "Count down from 10 to 1" |
-| **Loop through list** | "Check every ingredient in your pantry" |
-| **`withIndex()`** | "Item #1, Item #2, Item #3..." |
 
 ---
 
