@@ -1,3 +1,4 @@
-fun main() {
-  println("Hello, World!") // println to print with newline,print without 
+fun main() { // <-- entry point
+  println ("Hello, World!")
+  // println ("Hello, World!") without new line
 }
