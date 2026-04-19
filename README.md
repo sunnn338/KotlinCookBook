@@ -2,7 +2,7 @@
 # Kotlin CookBook 🍳
 
 ![Kotlin Version](https://img.shields.io/badge/Kotlin-2.3.20-blue)
-![License](https://img.shields.io/badge/License-Apache-green)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 ![Tests](https://github.com/realmg51-cpu/KotlinCookBook/actions/workflows/ci.yml/badge.svg)
 ![Stars](https://img.shields.io/github/stars/realmg51-cpu/KotlinCookBook)
