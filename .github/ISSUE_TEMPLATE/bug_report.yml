@@ -1,0 +1,80 @@
+name: 🐞 Bug Report
+description: Report a bug in a recipe
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 🐞 Bug Report
+        Thanks for helping improve Kotlin CookBook!
+        
+        Before submitting, please check existing issues to avoid duplicates.
+
+  - type: input
+    id: recipe
+    attributes:
+      label: 📁 Recipe Name
+      description: Which recipe has the bug?
+      placeholder: e.g., src/kotlin/normal/ForStirring.kt
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ Expected Behavior
+      description: What should happen when you run the recipe?
+      placeholder: The program should print "Hello, World!"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ❌ Actual Behavior
+      description: What actually happened?
+      placeholder: Got compilation error "unresolved reference"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🔪 Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Run `kotlinc -script src/kotlin/normal/...`
+        2. See error...
+      render: bash
+    validations:
+      required: true
+
+  - type: input
+    id: kotlin-version
+    attributes:
+      label: 🔧 Kotlin Version
+      description: Run `kotlinc -version`
+      placeholder: e.g., Kotlin version 2.3.20
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 💻 Operating System
+      options:
+        - Windows
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📝 Additional Context
+      description: Screenshots, error logs, or any other relevant information
+      placeholder: Add any other context here...
