@@ -1,0 +1,77 @@
+name: 🍳 Recipe Request
+description: Suggest a new recipe for the cookbook
+title: "[NEW RECIPE]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 🍳 New Recipe Request
+        What Kotlin concept should we cook next?
+        
+        Your idea will help someone learn something new!
+
+  - type: input
+    id: concept
+    attributes:
+      label: 📚 Concept Name
+      description: What Kotlin feature or concept?
+      placeholder: e.g., Sealed Classes, Coroutines, Extension Functions, Scope Functions
+    validations:
+      required: true
+
+  - type: textarea
+    id: analogy
+    attributes:
+      label: 🍳 Kitchen Analogy
+      description: How would you explain this concept using a kitchen analogy?
+      placeholder: |
+        Example: "A sealed class is like a fixed menu – you know exactly what dishes are available."
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: example
+    attributes:
+      label: 📝 Example Code
+      description: If you have an example, share it!
+      placeholder: |
+        fun main() {
+            // Your example here
+        }
+      render: kotlin
+    validations:
+      required: false
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: 🎯 Difficulty Level
+      description: How hard is this concept?
+      options:
+        - 🍜 Beginner
+        - 🥘 Intermediate
+        - 🔥 Advanced
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 💡 Why would this be useful?
+      description: Why should this recipe be added to the cookbook?
+      placeholder: |
+        This concept is important because...
+        It will help learners understand...
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: 📖 Helpful Resources
+      description: Any links to documentation or examples?
+      placeholder: |
+        - Kotlin docs: https://kotlinlang.org/docs/...
+        - Example article: ...
