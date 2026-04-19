@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🤔 Question or Discussion
+    url: https://github.com/realmg51-cpu/KotlinCookBook/discussions
+    about: Please ask questions and start discussions here
+  - name: 📚 Kotlin Official Documentation
+    url: https://kotlinlang.org/docs/home.html
+    about: Check the official Kotlin docs for language reference
+  - name: 💬 Kotlin Slack Community
+    url: https://kotlinlang.org/community/
+    about: Join the Kotlin community for help
