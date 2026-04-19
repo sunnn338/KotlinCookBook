@@ -1,0 +1,59 @@
+name: 📝 Documentation Issue
+description: Report a typo, unclear explanation, or missing docs
+title: "[DOCS]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 📝 Documentation Issue
+        Help us make the cookbook easier to understand!
+
+  - type: input
+    id: location
+    attributes:
+      label: 📁 File Location
+      description: Which file has the issue?
+      placeholder: e.g., README.md, introduction.md, CONTRIBUTING.md
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: 🔍 Issue Type
+      options:
+        - Typo / Spelling mistake
+        - Unclear explanation
+        - Missing information
+        - Broken link
+        - Outdated content
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: 📖 Current Text
+      description: What does it currently say?
+      placeholder: Copy the problematic text here
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested
+    attributes:
+      label: ✏️ Suggested Fix
+      description: What should it say instead?
+      placeholder: Your suggested correction
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: 💡 Why is this change needed?
+      description: Explain why this improvement matters
+      placeholder: This is confusing because...
+    validations:
+      required: false
