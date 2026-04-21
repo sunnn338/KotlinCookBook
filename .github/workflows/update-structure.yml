@@ -18,44 +18,51 @@ jobs:
       - name: Install tree
         run: sudo apt-get install -y tree
       
-      - name: Generate structure with echo
+      - name: Generate and update
         run: |
-          # Tạo nội dung structure mới
-          echo "## 📁 Project Structure" > /tmp/structure.md
-          echo "" >> /tmp/structure.md
-          echo '```' >> /tmp/structure.md
-          tree src/kotlin/normal --dirsfirst -I "*.md" -L 4 >> /tmp/structure.md
-          echo '```' >> /tmp/structure.md
-          echo "" >> /tmp/structure.md
+          # Tạo structure
+          echo "## 📁 Project Structure" > /tmp/structure.txt
+          echo "" >> /tmp/structure.txt
+          echo '```' >> /tmp/structure.txt
+          tree src/kotlin/normal --dirsfirst -I "*.md" -L 4 >> /tmp/structure.txt
+          echo '```' >> /tmp/structure.txt
+          echo "" >> /tmp/structure.txt
           
-          # Thống kê
           RECIPE_COUNT=$(find src/kotlin/normal -name "*.kt" -type f | wc -l)
-          CATEGORY_COUNT=$(find src/kotlin/normal -mindepth 1 -maxdepth 1 -type d | wc -l)
+          echo "📊 **$RECIPE_COUNT recipes**" >> /tmp/structure.txt
+          echo "" >> /tmp/structure.txt
+          echo '<img src=".github/avatars/bot.svg" width="30">' >> /tmp/structure.txt
+          echo "" >> /tmp/structure.txt
+          echo "*Updated: $(date +'%Y-%m-%d')*" >> /tmp/structure.txt
           
-          echo "### 📊 Statistics" >> /tmp/structure.md
-          echo "" >> /tmp/structure.md
-          echo "| Metric | Value |" >> /tmp/structure.md
-          echo "|--------|-------|" >> /tmp/structure.md
-          echo "| 🍳 Recipes | \`$RECIPE_COUNT\` files |" >> /tmp/structure.md
-          echo "| 📁 Categories | \`$CATEGORY_COUNT\` folders |" >> /tmp/structure.md
-          echo "" >> /tmp/structure.md
-          echo "---" >> /tmp/structure.md
-          echo "" >> /tmp/structure.md
-          echo '<img src=".github/avatars/bot.svg" width="40">' >> /tmp/structure.md
-          echo "" >> /tmp/structure.md
-          echo "*Last update: $(date +'%Y-%m-%d %H:%M:%S UTC')*" >> /tmp/structure.md
-      
-      - name: Update README at correct position
-        run: |
-          # Xóa section cũ nếu có
-          sed -i '/<!-- STRUCTURE_START -->/,/<!-- STRUCTURE_END -->/d' README.md
+          # Dùng Python để cập nhật README
+          python3 << 'PYTHON_EOF'
+          import re
           
-          # Thêm markers và nội dung mới vào trước dòng "Happy cooking"
-          sed -i '/\*\*Happy cooking! 👨‍🍳🍳\*\*/i\
-          <!-- STRUCTURE_START -->\
-          '"$(cat /tmp/structure.md)"'\
-          <!-- STRUCTURE_END -->\
-          ' README.md
+          # Đọc structure mới
+          with open('/tmp/structure.txt', 'r') as f:
+              new_struct = f.read().strip()
+          
+          # Đọc README
+          with open('README.md', 'r') as f:
+              readme = f.read()
+          
+          # Xóa section cũ
+          readme = re.sub(r'<!-- STRUCTURE_START -->.*?<!-- STRUCTURE_END -->', '', readme, flags=re.DOTALL)
+          
+          # Tìm vị trí "Happy cooking"
+          pattern = r'(\*\*Happy cooking! 👨‍🍳🍳\*\*)'
+          
+          # Chèn structure mới vào trước
+          replacement = f'<!-- STRUCTURE_START -->\n{new_struct}\n<!-- STRUCTURE_END -->\n\n\1'
+          new_readme = re.sub(pattern, replacement, readme, flags=re.DOTALL)
+          
+          # Ghi lại
+          with open('README.md', 'w') as f:
+              f.write(new_readme)
+          
+          print("✅ README updated")
+          PYTHON_EOF
       
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
