@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Nồi -->
+  <rect x="25" y="40" width="50" height="40" rx="5" fill="#FF6B35"/>
+  <!-- Tay cầm -->
+  <path d="M75 50 L90 45 Q95 55 90 65 L75 60" fill="none" stroke="#333" stroke-width="4"/>
+  <!-- Mắt -->
+  <circle cx="40" cy="55" r="4" fill="white"/>
+  <circle cx="60" cy="55" r="4" fill="white"/>
+  <!-- Mũi -->
+  <circle cx="50" cy="63" r="3" fill="#FFD700"/>
+  <!-- Khói -->
+  <path d="M35 40 Q30 25 40 20" fill="none" stroke="#999" stroke-width="2"/>
+  <path d="M50 40 Q50 20 60 15" fill="none" stroke="#999" stroke-width="2"/>
+  <path d="M65 40 Q70 25 80 20" fill="none" stroke="#999" stroke-width="2"/>
+</svg>
