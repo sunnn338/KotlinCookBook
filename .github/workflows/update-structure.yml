@@ -15,94 +15,162 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install tree
-        run: sudo apt-get install -y tree
-      
-      - name: Generate structure and statistics
+      - name: Generate structure with Python
         run: |
-          # Tạo nội dung structure
-          cat > /tmp/structure.md << 'EOF'
-          ## 📁 Project Structure
+          python3 << 'PYTHON_EOF'
+          import os
+          import re
+          from pathlib import Path
+          from datetime import datetime
           
-          ```
-          EOF
+          # ===== GENERATE TREE STRUCTURE =====
+          def generate_tree(path, prefix="", is_last=True, level=0):
+              """Generate ASCII tree structure"""
+              if level > 5:
+                  return []
+              
+              lines = []
+              items = sorted([p for p in Path(path).iterdir() 
+                             if p.name not in ["introduction.md", ".DS_Store", "__pycache__"]],
+                             key=lambda x: (not x.is_dir(), x.name.lower()))
+              
+              for i, item in enumerate(items):
+                  is_last_item = (i == len(items) - 1)
+                  connector = "└── " if is_last_item else "├── "
+                  
+                  if item.is_dir():
+                      lines.append(f"{prefix}{connector}{item.name}/")
+                      next_prefix = prefix + ("    " if is_last_item else "│   ")
+                      lines.extend(generate_tree(item, next_prefix, is_last_item, level + 1))
+                  elif item.suffix == '.kt':
+                      lines.append(f"{prefix}{connector}{item.name}")
+              
+              return lines
           
-          tree src/kotlin/normal --dirsfirst -I "*.md" -L 4 >> /tmp/structure.md
+          # ===== CALCULATE STATISTICS =====
+          total_recipes = len(list(Path("src/kotlin/normal").rglob("*.kt")))
+          categories = len([d for d in Path("src/kotlin/normal").iterdir() if d.is_dir()])
           
-          cat >> /tmp/structure.md << 'EOF'
-          ```
+          # Find category with most recipes
+          most_recipes = ""
+          max_count = 0
+          category_counts = {}
           
-          EOF
+          for cat_dir in Path("src/kotlin/normal").iterdir():
+              if cat_dir.is_dir():
+                  count = len(list(cat_dir.rglob("*.kt")))
+                  category_counts[cat_dir.name] = count
+                  if count > max_count:
+                      max_count = count
+                      most_recipes = f"{cat_dir.name} ({count} files)"
           
-          # Thống kê
-          TOTAL=$(find src/kotlin/normal -name "*.kt" -type f | wc -l)
-          CAT=$(find src/kotlin/normal -mindepth 1 -maxdepth 1 -type d | wc -l)
-          MOST=$(find src/kotlin/normal -mindepth 2 -name "*.kt" 2>/dev/null | cut -d'/' -f4 | sort | uniq -c | sort -rn | head -1 | awk '{print $2 " (" $1 " files)"}')
+          # Calculate overall progress (assuming target is 50 recipes)
+          total_target = 50
+          progress_percent = int((total_recipes / total_target) * 100)
           
-          cat >> /tmp/structure.md << EOF
-          ## 📊 Statistics
+          # ===== GENERATE CONTENT =====
+          content = []
           
-          | Metric | Value |
-          |--------|-------|
-          | 🍳 **Total Recipes** | \`$TOTAL\` Kotlin files |
-          | 📁 **Categories** | \`$CAT\` folders |
-          | 📈 **Most recipes** | $MOST |
+          # Project Structure
+          content.append("## 📁 Project Structure")
+          content.append("")
+          content.append("```")
+          content.append("src/kotlin/normal/")
+          content.extend(generate_tree("src/kotlin/normal"))
+          content.append("```")
+          content.append("")
           
-          ---
+          # Statistics
+          content.append("## 📊 Statistics")
+          content.append("")
+          content.append("| Metric | Value |")
+          content.append("|--------|-------|")
+          content.append(f"| 🍳 **Total Recipes** | `{total_recipes}` Kotlin files |")
+          content.append(f"| 📁 **Categories** | `{categories}` folders |")
+          content.append(f"| 📈 **Most recipes** | {most_recipes} |")
+          content.append(f"| 🎯 **Progress** | `{total_recipes}/{total_target}` recipes ({progress_percent}%) |")
+          content.append(f"| 🆕 **Latest update** | {datetime.now().strftime('%Y-%m-%d')} |")
+          content.append("")
+          content.append("---")
+          content.append("")
+          content.append("### 🏆 Category Breakdown")
+          content.append("")
+          content.append("| Category | Recipes | Progress |")
+          content.append("|----------|---------|----------|")
           
-          <img src=".github/avatars/bot.svg" width="40">
+          # Progress bar function
+          def progress_bar(count, max_count=10):
+              filled = min(count, max_count)
+              empty = max_count - filled
+              return "█" * filled + "░" * empty
           
-          *Auto-updated by KotlinCookBot 🤖*
-          *Last update: $(date +'%Y-%m-%d %H:%M:%S UTC')*
+          # Add each category
+          for cat_name, count in sorted(category_counts.items()):
+              bar = progress_bar(count, 10)
+              content.append(f"| {cat_name} | {count} | {bar} {count*10}% |")
           
-          EOF
+          content.append("")
+          content.append("---")
+          content.append("")
+          content.append('<img src=".github/avatars/bot.svg" width="40">')
+          content.append("")
+          content.append("*Auto-updated by KotlinCookBot 🤖*")
+          content.append(f"*Last update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*")
+          content.append("")
+          
+          # Join all content
+          new_structure = "\n".join(content)
+          
+          # Save to file
+          with open('/tmp/new_structure.md', 'w', encoding='utf-8') as f:
+              f.write(new_structure)
+          
+          print(f"✅ Generated structure with {total_recipes} recipes, {categories} categories")
+          print(f"📊 Most recipes: {most_recipes}")
+          PYTHON_EOF
       
       - name: Update README with Python
         run: |
           python3 << 'PYTHON_EOF'
           import re
           
-          # Đọc nội dung mới
-          with open('/tmp/structure.md', 'r') as f:
-              new_content = f.read().strip()
+          # Read new content
+          with open('/tmp/new_structure.md', 'r', encoding='utf-8') as f:
+              new_content = f.read()
           
-          # Đọc README hiện tại
-          with open('README.md', 'r') as f:
+          # Read current README
+          with open('README.md', 'r', encoding='utf-8') as f:
               readme = f.read()
           
-          # Xóa section cũ (nếu có)
-          readme = re.sub(
-              r'<!-- STRUCTURE_START -->.*?<!-- STRUCTURE_END -->',
-              '',
-              readme,
-              flags=re.DOTALL
-          )
+          # Remove old structure section (between markers)
+          pattern = r'<!-- STRUCTURE_START -->.*?<!-- STRUCTURE_END -->'
+          readme = re.sub(pattern, '', readme, flags=re.DOTALL)
           
-          # Xóa các dòng trống thừa
+          # Clean up extra newlines
           readme = re.sub(r'\n{3,}', '\n\n', readme)
           
-          # Tìm vị trí "Happy cooking"
+          # Find position to insert (before "Happy cooking")
           happy_pattern = r'(\*\*Happy cooking! 👨‍🍳🍳\*\*)'
           
-          # Nội dung mới với markers
+          # New content with markers
           replacement = f'<!-- STRUCTURE_START -->\n{new_content}\n<!-- STRUCTURE_END -->\n\n\\1'
           
           if re.search(happy_pattern, readme):
-              # Chèn vào trước "Happy cooking"
+              # Insert before "Happy cooking"
               new_readme = re.sub(happy_pattern, replacement, readme)
           else:
-              # Nếu không tìm thấy, thêm vào cuối file
+              # If not found, append to end
               new_readme = readme.rstrip() + f'\n\n<!-- STRUCTURE_START -->\n{new_content}\n<!-- STRUCTURE_END -->\n'
           
-          # Đảm bảo không có dòng trống ở cuối
+          # Ensure no trailing issues
           new_readme = new_readme.rstrip() + '\n'
           
-          # Ghi lại README
-          with open('README.md', 'w') as f:
+          # Write back with UTF-8 encoding
+          with open('README.md', 'w', encoding='utf-8') as f:
               f.write(new_readme)
           
           print("✅ README updated successfully")
-          print(f"📊 Statistics: {new_content[:200]}...")
+          print("📝 Structure and statistics added before 'Happy cooking'")
           PYTHON_EOF
       
       - name: Commit changes
@@ -114,7 +182,7 @@ jobs:
           commit_author: "KotlinCookBot <41898282+github-actions[bot]@users.noreply.github.com>"
           file_pattern: "README.md"
       
-      - name: Summary
+      - name: Print summary
         run: |
           echo "## 🍳 Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
