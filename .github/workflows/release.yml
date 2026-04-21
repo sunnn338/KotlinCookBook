@@ -4,31 +4,68 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name (e.g., v1.0.0)'
+        required: true
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      discussions: write
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
-      - name: Generate changelog
+      - name: Get version
+        id: version
         run: |
-          echo "# 🍳 KotlinCookBook ${{ github.ref_name }}" > CHANGELOG_NEW.md
-          echo "" >> CHANGELOG_NEW.md
-          echo "## What's New" >> CHANGELOG_NEW.md
-          echo "" >> CHANGELOG_NEW.md
-          git log --oneline --pretty="- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> CHANGELOG_NEW.md
+          TAG_NAME=${GITHUB_REF_NAME}
+          if [ -z "$TAG_NAME" ]; then
+            TAG_NAME="${{ github.event.inputs.tag_name }}"
+          fi
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+      
+      - name: Count recipes
+        id: stats
+        run: |
+          COUNT=$(find src/kotlin/normal -name "*.kt" -type f | wc -l)
+          echo "recipes=$COUNT" >> $GITHUB_OUTPUT
+      
+      - name: Generate release notes
+        run: |
+          cat > release_notes.md << EOF
+          ## 🍳 KotlinCookBook ${{ steps.version.outputs.tag }}
           
-          # Count recipes
-          RECIPE_COUNT=$(find src/kotlin/normal -name "*.kt" | wc -l)
-          echo "" >> CHANGELOG_NEW.md
-          echo "## Statistics" >> CHANGELOG_NEW.md
-          echo "- 🍳 Total recipes: $RECIPE_COUNT" >> CHANGELOG_NEW.md
+          ### What's New
+          
+          $(git log --oneline --pretty="- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "HEAD")..HEAD)
+          
+          ### 📊 Statistics
+          
+          - 🍽️ Total recipes: ${{ steps.stats.outputs.recipes }}
+          - 📁 Categories: $(find src/kotlin/normal -mindepth 1 -maxdepth 1 -type d | wc -l)
+          
+          ### 🤖 Maintained by KotlinCookBot
+          
+          <img src="https://raw.githubusercontent.com/${{ github.repository }}/main/.github/avatars/bot.svg" width="50">
+          
+          ---
+          
+          *Happy cooking! 🍳*
+          EOF
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: CHANGELOG_NEW.md
+          body_path: release_notes.md
+          name: "🍳 ${{ steps.version.outputs.tag }}"
           draft: false
           prerelease: false
           generate_release_notes: false
