@@ -1,72 +1,35 @@
-name: Docker CI
+name: Docker CI - Compile & Run
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
-  docker-test:
+  test:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
+      - uses: actions/checkout@v4
       - name: Build Docker image
-        run: |
-          docker build -t kotlincookbook .
-          docker images | grep kotlincookbook
+        run: docker build -t kotlincookbook .
       
-      - name: List all recipes (debug)
+      - name: Compile and run all recipes
         run: |
-          echo "📚 Recipes in Docker image:"
-          docker run --rm kotlincookbook sh -c "find src/kotlin/normal -name '*.kt' -type f | sort"
-      
-      - name: Test all recipes with Docker
-        run: |
-          echo "🍳 Testing KotlinCookBook recipes with Docker"
-          echo "============================================"
-          
-          failed=0
-          total=0
-          
-          # Get all .kt files from Docker image
-          recipes=$(docker run --rm kotlincookbook sh -c "find src/kotlin/normal -name '*.kt' -type f")
-          
-          for recipe in $recipes; do
-            total=$((total + 1))
-            name=$(basename "$recipe")
-            dir=$(echo "$recipe" | cut -d'/' -f4-5)
-            
-            echo -n "Testing $dir/$name... "
-            
-            if docker run --rm kotlincookbook kotlin "$recipe" 2>&1; then
-                echo "✅ PASS"
-            else
-                echo "❌ FAIL"
+          docker run --rm kotlincookbook sh -c '
+            failed=0
+            for f in $(find src/kotlin/normal -name "*.kt"); do
+              name=$(basename "$f" .kt)
+              echo "🔨 Compiling $name..."
+              
+              # Compile to jar
+              kotlinc "$f" -include-runtime -d "/tmp/$name.jar"
+              
+              # Run the jar
+              if java -jar "/tmp/$name.jar"; then
+                echo "✅ $name passed"
+              else
+                echo "❌ $name failed"
                 failed=$((failed + 1))
-            fi
-            echo ""
-          done
-          
-          echo "============================================"
-          echo "📊 Results: $((total - failed))/$total passed"
-          
-          if [ $failed -eq 0 ]; then
-            echo "🎉 All recipes are cooking perfectly!"
-            exit 0
-          else
-            echo "💥 $failed recipe(s) need fixing!"
-            exit 1
-          fi
-      
-      - name: Docker image info
-        run: |
-          echo "🐳 Docker image size:"
-          docker images kotlincookbook --format "{{.Size}}"
-          
-          echo ""
-          echo "Kotlin version in container:"
-          docker run --rm kotlincookbook kotlin -version
+              fi
+              echo ""
+              rm -f "/tmp/$name.jar"
+            done
+            exit $failed
+          '
