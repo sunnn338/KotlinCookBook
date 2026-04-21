@@ -1,7 +1,7 @@
 # 🍳 KotlinCookBook Dockerfile
 # Learn Kotlin the fun way - No installation required!
 
-FROM kotlin:2.3.20
+FROM kotlin:latest
 
 WORKDIR /app
 
