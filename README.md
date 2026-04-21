@@ -60,7 +60,7 @@ Verify installation:
 kotlin -version
 ```
 
-For detailed setup instructions, see [InstallAndSetup.md](InstallAndSetup.md)
+For detailed setup instructions, see [InstallAndSetup.md](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/GettingStarted/InstallAndSetup.md)
 
 ---
 
@@ -140,7 +140,7 @@ Some recipes use `readln()` to get input from you. Just follow the prompts!
 
 ## ⏰ 30-Minute Quick Start
 
-- **5 min** - Setup kitchen ([InstallAndSetup.md](./src/kotlin/normal/GettingStarted/InstallAndSetup.md))
+- **5 min** - Setup kitchen ([InstallAndSetup.md](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/GettingStarted/InstallAndSetup.https))
 - **5 min** - Cook `HelloWorld.kt`
 - **5 min** - Understand `val` vs `var`
 - **5 min** - Play with `DataTypes.kt`
