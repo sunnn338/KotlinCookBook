@@ -258,7 +258,7 @@ Have questions? Suggestions? Want to share your own recipe?
 
 ---
 
-**Happy Coking! 👩🏻‍🍳**
+**Happy cooking! 👨‍🍳🍳**
 
 Now go cook some Kotlin! 🚀
 
