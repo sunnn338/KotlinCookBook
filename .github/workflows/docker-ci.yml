@@ -1,5 +1,4 @@
-# .github/workflows/docker-test.yml
-name: Docker Test
+name: Docker CI
 
 on:
   push:
@@ -12,21 +11,62 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Build Docker image
-        run: docker build -t kotlincookbook .
-      
-      - name: Test all recipes in Docker
         run: |
-          for recipe in src/kotlin/normal/*.kt; do
-            echo "Testing $(basename $recipe)..."
-            docker run --rm kotlincookbook kotlin "$recipe"
+          docker build -t kotlincookbook .
+          docker images | grep kotlincookbook
+      
+      - name: List all recipes (debug)
+        run: |
+          echo "📚 Recipes in Docker image:"
+          docker run --rm kotlincookbook sh -c "find src/kotlin/normal -name '*.kt' -type f | sort"
+      
+      - name: Test all recipes with Docker
+        run: |
+          echo "🍳 Testing KotlinCookBook recipes with Docker"
+          echo "============================================"
+          
+          failed=0
+          total=0
+          
+          # Get all .kt files from Docker image
+          recipes=$(docker run --rm kotlincookbook sh -c "find src/kotlin/normal -name '*.kt' -type f")
+          
+          for recipe in $recipes; do
+            total=$((total + 1))
+            name=$(basename "$recipe")
+            dir=$(echo "$recipe" | cut -d'/' -f4-5)
+            
+            echo -n "Testing $dir/$name... "
+            
+            if docker run --rm kotlincookbook kotlin "$recipe" 2>&1; then
+                echo "✅ PASS"
+            else
+                echo "❌ FAIL"
+                failed=$((failed + 1))
+            fi
+            echo ""
           done
+          
+          echo "============================================"
+          echo "📊 Results: $((total - failed))/$total passed"
+          
+          if [ $failed -eq 0 ]; then
+            echo "🎉 All recipes are cooking perfectly!"
+            exit 0
+          else
+            echo "💥 $failed recipe(s) need fixing!"
+            exit 1
+          fi
       
-      - name: Push to Docker Hub (on main branch)
-        if: github.ref == 'refs/heads/main'
+      - name: Docker image info
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker tag kotlincookbook ${{ secrets.DOCKER_USERNAME }}/kotlincookbook:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/kotlincookbook:latest
+          echo "🐳 Docker image size:"
+          docker images kotlincookbook --format "{{.Size}}"
+          
+          echo ""
+          echo "Kotlin version in container:"
+          docker run --rm kotlincookbook kotlin -version
