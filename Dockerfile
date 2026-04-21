@@ -7,7 +7,7 @@ FROM eclipse-temurin:17-jdk-alpine
 RUN apk add --no-cache curl unzip bash
 
 # Tải và cài Kotlin 2.0.20 trực tiếp từ GitHub
-RUN curl -L "https://github.com/JetBrains/kotlin/releases/download/v2.0.20/kotlin-compiler-2.3.20.zip" -o /tmp/kotlin.zip \
+RUN curl -L "https://github.com/JetBrains/kotlin/releases/download/v2.3.20/kotlin-compiler-2.3.20.zip" -o /tmp/kotlin.zip \
     && unzip /tmp/kotlin.zip -d /opt \
     && ln -s /opt/kotlinc/bin/kotlin /usr/local/bin/kotlin \
     && ln -s /opt/kotlinc/bin/kotlinc /usr/local/bin/kotlinc \
