@@ -20,54 +20,46 @@ jobs:
       
       - name: Generate structure with echo
         run: |
-          # Start with marker
-          echo "<!-- STRUCTURE_START -->" > /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo "## 📁 Project Structure" >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo '```' >> /tmp/new.md
+          # Tạo nội dung structure mới
+          echo "## 📁 Project Structure" > /tmp/structure.md
+          echo "" >> /tmp/structure.md
+          echo '```' >> /tmp/structure.md
+          tree src/kotlin/normal --dirsfirst -I "*.md" -L 4 >> /tmp/structure.md
+          echo '```' >> /tmp/structure.md
+          echo "" >> /tmp/structure.md
           
-          # Add tree output
-          tree src/kotlin/normal --dirsfirst -I "*.md" -L 4 >> /tmp/new.md
-          
-          # Close code block
-          echo '```' >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          
-          # Add statistics
+          # Thống kê
           RECIPE_COUNT=$(find src/kotlin/normal -name "*.kt" -type f | wc -l)
           CATEGORY_COUNT=$(find src/kotlin/normal -mindepth 1 -maxdepth 1 -type d | wc -l)
           
-          echo "### 📊 Statistics" >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo "| Metric | Value |" >> /tmp/new.md
-          echo "|--------|-------|" >> /tmp/new.md
-          echo "| 🍳 Recipes | \`$RECIPE_COUNT\` files |" >> /tmp/new.md
-          echo "| 📁 Categories | \`$CATEGORY_COUNT\` folders |" >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo "---" >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo '<img src=".github/avatars/bot.svg" width="40">' >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo "*Last update: $(date +'%Y-%m-%d %H:%M:%S UTC')*" >> /tmp/new.md
-          echo "" >> /tmp/new.md
-          echo "<!-- STRUCTURE_END -->" >> /tmp/new.md
+          echo "### 📊 Statistics" >> /tmp/structure.md
+          echo "" >> /tmp/structure.md
+          echo "| Metric | Value |" >> /tmp/structure.md
+          echo "|--------|-------|" >> /tmp/structure.md
+          echo "| 🍳 Recipes | \`$RECIPE_COUNT\` files |" >> /tmp/structure.md
+          echo "| 📁 Categories | \`$CATEGORY_COUNT\` folders |" >> /tmp/structure.md
+          echo "" >> /tmp/structure.md
+          echo "---" >> /tmp/structure.md
+          echo "" >> /tmp/structure.md
+          echo '<img src=".github/avatars/bot.svg" width="40">' >> /tmp/structure.md
+          echo "" >> /tmp/structure.md
+          echo "*Last update: $(date +'%Y-%m-%d %H:%M:%S UTC')*" >> /tmp/structure.md
       
-      - name: Remove old structure and replace
+      - name: Update README at correct position
         run: |
-          # Delete everything between markers (including markers)
+          # Xóa section cũ nếu có
           sed -i '/<!-- STRUCTURE_START -->/,/<!-- STRUCTURE_END -->/d' README.md
           
-          # Append new structure at the end
-          cat /tmp/new.md >> README.md
-          
-          # Clean up extra blank lines
-          sed -i '/^$/N;/^\n$/D' README.md
+          # Thêm markers và nội dung mới vào trước dòng "Happy cooking"
+          sed -i '/\*\*Happy cooking! 👨‍🍳🍳\*\*/i\
+          <!-- STRUCTURE_START -->\
+          '"$(cat /tmp/structure.md)"'\
+          <!-- STRUCTURE_END -->\
+          ' README.md
       
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "📁 docs: update project structure [skip ci]"
+          commit_message: "📁 docs: update structure [skip ci]"
           commit_user_name: "KotlinCookBot"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           file_pattern: "README.md"
