@@ -128,6 +128,47 @@ Some recipes use `readln()` to get input from you. Just follow the prompts!
 
 ---
 
+<!-- STRUCTURE_START -->
+## 📁 Project Structure
+
+```
+src/kotlin/normal/
+├── BreakAndContinue/
+│   ├── Break.kt
+│   └── Continue.kt
+├── GettingStarted/
+│   ├── HelloWorld.kt
+├── IfChef/
+│   └── IfChef.kt
+├── Loops/
+│   ├── For/
+│   │   └── ForStirring.kt
+│   └── While/
+│       └── WhileStirring.kt
+├── Variables/
+│   ├── WorkWithIt/
+│   │   ├── StringSplitter.kt
+│   │   └── StringSplitterv2.kt
+│   ├── CommonVariables.kt
+│   ├── ImmutableVariables.kt
+│   └── MutableVariables.kt
+└── WhenChef/
+    └── WhenChef.kt
+```
+
+## 📊 Statistics
+
+| Metric | Value |
+|--------|-------|
+| 🍳 **Total Recipes** | `12` Kotlin files |
+| 📁 **Categories** | `6` folders |
+| 🆕 **Latest update** | 2026-04-22 |
+
+<img src=".github/avatars/bot.svg" width="30">
+
+*Auto-updated: 2026-04-22 06:42:09 UTC*
+<!-- STRUCTURE_END -->
+
 ## 🤝 How to Contribute
 
 Want to add your own recipe? Awesome! Here's how:
