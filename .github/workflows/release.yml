@@ -24,21 +24,41 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Get version
+      - name: Get tag from input or push
         id: version
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             TAG_NAME="${{ github.event.inputs.tag_name }}"
-            # Create tag if not exists
-            if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-              git tag "$TAG_NAME"
-              git push origin "$TAG_NAME"
-            fi
+            echo "Using manual tag: $TAG_NAME"
           else
             TAG_NAME="${GITHUB_REF_NAME}"
+            echo "Using push tag: $TAG_NAME"
           fi
+          
           echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "version=${TAG_NAME#v}" >> $GITHUB_OUTPUT
+      
+      - name: Check if tag exists
+        id: check
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Tag $TAG already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "📝 Tag $TAG does not exist yet"
+          fi
+      
+      - name: Create tag if not exists
+        if: steps.check.outputs.exists == 'false' && github.event_name == 'workflow_dispatch'
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          git config user.name "KotlinCookBot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "✅ Created and pushed tag: $TAG"
       
       - name: Count recipes
         id: stats
@@ -51,13 +71,19 @@ jobs:
       - name: Get previous tag
         id: previous
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          CURRENT_TAG="${{ steps.version.outputs.tag }}"
+          PREV_TAG=$(git tag -l "v*" | grep -v "$CURRENT_TAG" | sort -V | tail -n1 || echo "")
           echo "tag=$PREV_TAG" >> $GITHUB_OUTPUT
       
       - name: Generate release notes
         run: |
+          CURRENT_TAG="${{ steps.version.outputs.tag }}"
+          PREV_TAG="${{ steps.previous.outputs.tag }}"
+          
           cat > release_notes.md << EOF
-          ## 🍳 KotlinCookBook ${{ steps.version.outputs.tag }}
+          ## 🍳 KotlinCookBook $CURRENT_TAG
+          
+          ### 📊 Statistics
           
           | Metric | Value |
           |--------|-------|
@@ -68,28 +94,21 @@ jobs:
           
           ### 🆕 What's New
           
-          $(git log --oneline --pretty="- %s" ${{ steps.previous.outputs.tag }}..HEAD 2>/dev/null || git log --oneline --pretty="- %s" -10)
+          EOF
+          
+          if [ -n "$PREV_TAG" ]; then
+            git log --oneline --pretty="- %s" "$PREV_TAG..HEAD" >> release_notes.md
+          else
+            git log --oneline --pretty="- %s" -10 >> release_notes.md
+          fi
+          
+          cat >> release_notes.md << EOF
           
           ---
           
           ### 🤖 Maintained by KotlinCookBot
           
           <img src="https://raw.githubusercontent.com/${{ github.repository }}/main/.github/avatars/bot.svg" width="50">
-          
-          ---
-          
-          ### 🚀 How to Use
-          
-          \`\`\`bash
-          # Pull from GHCR
-          docker pull ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
-          
-          # Run a recipe
-          docker run --rm ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }} \\
-            kotlin src/kotlin/normal/GettingStarted/HelloWorld.kt
-          \`\`\`
-          
-          ---
           
           *Happy cooking! 🍳*
           EOF
@@ -99,6 +118,7 @@ jobs:
         with:
           body_path: release_notes.md
           name: "🍳 ${{ steps.version.outputs.tag }}"
+          tag_name: ${{ steps.version.outputs.tag }}  # 👈 QUAN TRỌNG
           draft: false
           prerelease: false
           generate_release_notes: false
@@ -110,9 +130,5 @@ jobs:
         run: |
           echo "## 🚀 Release Created" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Tag | \`${{ steps.version.outputs.tag }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Recipes | ${{ steps.stats.outputs.recipes }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }})" >> $GITHUB_STEP_SUMMARY
