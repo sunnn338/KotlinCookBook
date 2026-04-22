@@ -1,27 +1,26 @@
-# Dependabot configuration for Kotlin CookBook 🍳
-# Checks for outdated GitHub Actions daily at 6 AM
-
 version: 2
 updates:
-  # Check GitHub Actions for updates
+  # GitHub Actions - Check ALL workflows
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "06:00"
-      timezone: "Asia/Ho_Chi_Minh"  # UTC+7 (Việt Nam)
+      interval: "weekly"
+      day: "monday"
     labels:
       - "dependencies"
-      - "ci"
+      - "github-actions"
     commit-message:
       prefix: "ci"
-      prefix-development: "ci"
-      include: "scope"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "realmg51-cpu"  # Your GitHub username
-    # Optional: Group all action updates into one PR
-    groups:
-      github-actions:
-        patterns:
-          - "*"
+    # 👇 Quan trọng: Không ignore bất kỳ workflow nào
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]  # Chỉ bỏ qua patch, vẫn check minor/major
+    # Hoặc không có ignore gì cả
+
+  # Check tất cả workflows trong thư mục con
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
