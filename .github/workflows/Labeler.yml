@@ -1,0 +1,193 @@
+name: Issue Label Manager
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited]
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: issue-labels-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  manage-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure labels exist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: 'Unresolved', color: 'E99695', description: 'Issue not yet resolved' },
+              { name: 'Resolving', color: 'FBCA04', description: 'Currently being worked on' },
+              { name: 'Resolved', color: '2CBE4E', description: 'Issue has been resolved' }
+            ];
+            
+            for (const label of labels) {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name,
+                color: label.color,
+                description: label.description
+              }).catch(() => {}); // Ignore if already exists
+            }
+      
+      - name: New issue - Add Unresolved
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Unresolved']
+            });
+      
+      - name: Issue reopened - Back to Unresolved
+        if: github.event_name == 'issues' && github.event.action == 'reopened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Resolved'
+            }).catch(() => {});
+            
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Unresolved']
+            });
+      
+      - name: Issue closed - Add Resolved
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Unresolved'
+            }).catch(() => {});
+            
+            await github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Resolving'
+            }).catch(() => {});
+            
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Resolved']
+            });
+      
+      - name: Comment /resolve - Only for maintainers
+        if: |
+          github.event_name == 'issue_comment' &&
+          contains(github.event.comment.body, '/resolve')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentUser = context.payload.comment.user.login;
+            
+            // Check if user has write/admin permission
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: commentUser
+            });
+            
+            const isMaintainer = permission.permission === 'admin' || permission.permission === 'write';
+            
+            if (!isMaintainer) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '🍳 **KotlinCookBot:** Only maintainers can use `/resolve`. Please ask a project maintainer for help! 🔧'
+              });
+              return;
+            }
+            
+            // Remove Unresolved, add Resolving
+            await github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Unresolved'
+            }).catch(() => {});
+            
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Resolving']
+            });
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🍳 **KotlinCookBot:** Marked as `Resolving` - Someone is working on this! 🔧'
+            });
+      
+      - name: Comment /unresolve - Back to unresolved
+        if: |
+          github.event_name == 'issue_comment' &&
+          contains(github.event.comment.body, '/unresolve')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentUser = context.payload.comment.user.login;
+            
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: commentUser
+            });
+            
+            const isMaintainer = permission.permission === 'admin' || permission.permission === 'write';
+            
+            if (!isMaintainer) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '🍳 **KotlinCookBot:** Only maintainers can use `/unresolve`. 🔧'
+              });
+              return;
+            }
+            
+            await github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Resolving'
+            }).catch(() => {});
+            
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Unresolved']
+            });
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🍳 **KotlinCookBot:** Moved back to `Unresolved` - Ready for someone to pick up! 📋'
+            });
