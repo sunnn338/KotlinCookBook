@@ -1,57 +1,61 @@
-name: Issue Reviewer (Gemini)
+name: Manual Issue Reviewer
 
 on:
-  issues:
-    types: [opened]           # Tự động khi có issue mới
-  workflow_dispatch:          # 👈 Cho phép chạy tay
+  workflow_dispatch:
     inputs:
       issue_number:
-        description: 'Issue number to review'
+        description: 'Issue number'
         required: true
         type: number
-      custom_message:
-        description: 'Custom message (optional)'
-        required: false
-        type: string
 
 jobs:
-  review-issue:
+  review:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      contents: read
     
     steps:
-      - name: Get issue content
+      - name: Debug - Print issue number
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            # Chạy tay: lấy issue từ input
-            ISSUE_NUM=${{ inputs.issue_number }}
-            echo "Manual trigger for issue #$ISSUE_NUM"
-            
-            curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE_NUM" > /tmp/issue.json
-          else
-            # Tự động: lấy từ event
-            cat $GITHUB_EVENT_PATH > /tmp/issue.json
+          echo "Issue number: ${{ inputs.issue_number }}"
+          echo "Type check: ${{ github.event.inputs.issue_number }}"
+      
+      - name: Get issue content
+        id: issue
+        run: |
+          # Lấy issue number từ input (quan trọng!)
+          ISSUE_NUM="${{ inputs.issue_number }}"
+          
+          if [ -z "$ISSUE_NUM" ] || [ "$ISSUE_NUM" == "null" ]; then
+            echo "❌ No issue number provided!"
+            exit 1
           fi
           
-          jq -r '.title' /tmp/issue.json > /tmp/issue_title.txt
-          jq -r '.body' /tmp/issue.json > /tmp/issue_body.txt
-          jq -r '.number' /tmp/issue.json > /tmp/issue_number.txt
+          echo "Fetching issue #$ISSUE_NUM"
+          
+          # Gọi API để lấy issue
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE_NUM" \
+            -o /tmp/issue.json
+          
+          # Lưu issue number vào file
+          echo "$ISSUE_NUM" > /tmp/issue_number.txt
+          
+          # Kiểm tra nếu issue không tồn tại
+          if grep -q "Not Found" /tmp/issue.json; then
+            echo "❌ Issue #$ISSUE_NUM not found!"
+            exit 1
+          fi
+          
+          echo "✅ Issue found"
       
       - name: Call Gemini API
-        id: gemini
         run: |
-          TITLE=$(cat /tmp/issue_title.txt)
-          BODY=$(head -c 1500 /tmp/issue_body.txt)
-          CUSTOM="${{ inputs.custom_message }}"
+          BODY=$(jq -r '.body' /tmp/issue.json)
+          TITLE=$(jq -r '.title' /tmp/issue.json)
           
-          PROMPT="You are KotlinCookBot. Respond to this issue:
-          Title: $TITLE
-          Body: $BODY
-          ${CUSTOM:+Additional context: $CUSTOM}
-          
-          Keep response short, friendly, use emojis."
+          PROMPT="You are KotlinCookBot. Reply to issue: $TITLE - $BODY. Keep it short (max 100 words). Use emojis."
           
           ESCAPED_PROMPT=$(echo "$PROMPT" | jq -sR .)
           
@@ -66,19 +70,30 @@ jobs:
               }]
             }")
           
-          echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text // "Sorry, error!"' > /tmp/gemini_response.txt
+          echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text // "Sorry, I had trouble processing that!"' > /tmp/reply.txt
       
       - name: Add comment
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const issueNum = parseInt(fs.readFileSync('/tmp/issue_number.txt', 'utf8'));
-            const response = fs.readFileSync('/tmp/gemini_response.txt', 'utf8');
+            
+            // Đọc issue number từ file
+            const issueNumber = parseInt(fs.readFileSync('/tmp/issue_number.txt', 'utf8').trim());
+            const reply = fs.readFileSync('/tmp/reply.txt', 'utf8');
+            
+            console.log(`Posting comment to issue #${issueNumber}`);
+            
+            if (isNaN(issueNumber)) {
+              console.error('Invalid issue number!');
+              throw new Error('Issue number is NaN');
+            }
             
             await github.rest.issues.createComment({
-              issue_number: issueNum,
+              issue_number: issueNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🤖 **KotlinCookBot (Gemini)** says:\n\n${response}\n\n---\n*🔧 Manual run by @${{ github.actor }}*`
+              body: `🍳 **KotlinCookBot:**\n\n${reply}\n\n---\n*🔧 Manual run by @${{ github.actor }}*`
             });
+            
+            console.log('✅ Comment posted successfully!');
