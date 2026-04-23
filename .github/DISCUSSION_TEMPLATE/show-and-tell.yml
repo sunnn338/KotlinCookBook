@@ -1,0 +1,62 @@
+title: "Show & Tell 🎉"
+labels: ["show-and-tell"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🎉 Show off what you built!
+        
+        Share your Kotlin projects, learning journey, or anything cool you made! 🍳
+        
+        ---
+  
+  - type: input
+    id: project
+    attributes:
+      label: "🚀 Project Name"
+      placeholder: "My first Kotlin app"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: "📝 Description"
+      description: "What did you build? What did you learn?"
+      placeholder: |
+        I built a...
+        This helped me learn...
+    validations:
+      required: true
+  
+  - type: input
+    id: link
+    attributes:
+      label: "🔗 Link (GitHub, demo, etc.)"
+      placeholder: "https://github.com/..."
+  
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "📸 Screenshot (optional)"
+      placeholder: "Drag and drop or paste image link"
+  
+  - type: dropdown
+    id: kotlin_usage
+    attributes:
+      label: "🍳 How did KotlinCookBook help?"
+      options:
+        - "Learned a new concept"
+        - "Got inspiration"
+        - "Used a recipe as reference"
+        - "Just sharing my own work"
+  
+  - type: checkboxes
+    id: guidelines
+    attributes:
+      label: "📋 Guidelines"
+      options:
+        - label: "This is my own original work"
+          required: true
+        - label: "I'm sharing to inspire others"
+          required: true
