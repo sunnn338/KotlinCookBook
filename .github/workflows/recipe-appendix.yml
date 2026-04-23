@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'src/kotlin/normal/**/*.kt'
+      - 'src/kotlin/normal/**/introduction.md'
   workflow_dispatch:
 
 jobs:
@@ -15,72 +16,97 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Generate APPENDIX.md
+      - name: Generate APPENDIX.md from actual files
         run: |
+          # Start file
           echo "# 📚 KotlinCookBook - Complete Recipe Appendix" > APPENDIX.md
           echo "" >> APPENDIX.md
           echo "> *\"All recipes in one place - your complete Kotlin cookbook index!\"* 🍳" >> APPENDIX.md
           echo "" >> APPENDIX.md
           
-          echo "## Getting Started" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`HelloWorld.kt\` | Your first Kotlin program | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/GettingStarted/HelloWorld.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
+          # Store current category
+          current_category=""
           
-          echo "## Variables" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`CommonVariables.kt\` | Int, Char, String, Float, Double | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Variables/CommonVariables.kt) |" >> APPENDIX.md
-          echo "| \`ImmutableVariables.kt\` | \`val\` (cannot change) | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Variables/ImmutableVariables.kt) |" >> APPENDIX.md
-          echo "| \`MutableVariables.kt\` | \`var\` (can change) | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Variables/MutableVariables.kt) |" >> APPENDIX.md
-          echo "| \`StringSplitter.kt\` | String manipulation | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Variables/WorkWithIt/StringSplitter.kt) |" >> APPENDIX.md
-          echo "| \`StringSplitterv2.kt\` | Advanced string splitting | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Variables/WorkWithIt/StringSplitterv2.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
+          # Find all directories containing .kt files, sorted
+          for dir in $(find src/kotlin/normal -type d | sort); do
+            # Check if directory has any .kt file
+            kt_files=$(find "$dir" -maxdepth 1 -name "*.kt" -type f | head -1)
+            
+            if [ -n "$kt_files" ]; then
+              # Get category name from path
+              category=$(echo "$dir" | sed 's|src/kotlin/normal/||')
+              
+              # Clean up category name for display
+              if [[ "$category" == "Loops/For" ]]; then
+                display_category="Loops - For"
+              elif [[ "$category" == "Loops/While" ]]; then
+                display_category="Loops - While"
+              elif [[ "$category" == "Loops/DoWhile" ]]; then
+                display_category="Loops - Do-While"
+              elif [[ "$category" == "Variables/WorkWithIt" ]]; then
+                display_category="Variables (String Manipulation)"
+              elif [[ "$category" == "Functions/BasicFunction" ]]; then
+                display_category="Functions - Basic"
+              elif [[ "$category" == "Functions/LambdaFunction" ]]; then
+                display_category="Functions - Lambda"
+              else
+                display_category="$category"
+              fi
+              
+              echo "## $display_category" >> APPENDIX.md
+              echo "" >> APPENDIX.md
+              
+              # Check for introduction.md
+              intro_file="$dir/introduction.md"
+              if [ -f "$intro_file" ]; then
+                echo "<details>" >> APPENDIX.md
+                echo "<summary>📖 Read Introduction</summary>" >> APPENDIX.md
+                echo "" >> APPENDIX.md
+                # Extract first 20 lines of introduction (or full if small)
+                head -30 "$intro_file" >> APPENDIX.md
+                echo "" >> APPENDIX.md
+                echo "</details>" >> APPENDIX.md
+                echo "" >> APPENDIX.md
+              fi
+              
+              # Table header
+              echo "| Recipe | Description | Link |" >> APPENDIX.md
+              echo "|--------|-------------|------|" >> APPENDIX.md
+              
+              # Add each .kt file in this directory
+              for kt_file in $(find "$dir" -maxdepth 1 -name "*.kt" -type f | sort); do
+                recipe_name=$(basename "$kt_file")
+                
+                # Extract description from first comment in file
+                description=$(grep -E '^\s*\*\s*(What you'll learn:|Teaches:|Recipe:)' "$kt_file" | head -1 | sed 's/.*\*\s*//' | cut -c1-60)
+                
+                if [ -z "$description" ]; then
+                  description="Kotlin recipe"
+                fi
+                
+                # Create GitHub URL
+                url="https://github.com/${{ github.repository }}/blob/main/$kt_file"
+                
+                echo "| \`$recipe_name\` | $description | [🔗 View]($url) |" >> APPENDIX.md
+              done
+              
+              echo "" >> APPENDIX.md
+            fi
+          done
           
-          echo "## If/When" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`IfChef.kt\` | \`if\` and \`else\` decisions | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/IfChef/IfChef.kt) |" >> APPENDIX.md
-          echo "| \`WhenChef.kt\` | \`when\` expression (spice rack) | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/WhenChef/WhenChef.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
+          # Add special case: Root level .kt files (if any)
+          if [ -f "src/kotlin/normal/DataTypes.kt" ]; then
+            echo "## Data Types" >> APPENDIX.md
+            echo "" >> APPENDIX.md
+            echo "| Recipe | Description | Link |" >> APPENDIX.md
+            echo "|--------|-------------|------|" >> APPENDIX.md
+            echo "| \`DataTypes.kt\` | Int, Char, String, Float, Double | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/DataTypes.kt) |" >> APPENDIX.md
+            echo "" >> APPENDIX.md
+          fi
           
-          echo "## Loops" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`ForStirring.kt\` | \`for\` loop (batch cooking) | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Loops/For/ForStirring.kt) |" >> APPENDIX.md
-          echo "| \`WhileStirring.kt\` | \`while\` loop (check first) | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Loops/While/WhileStirring.kt) |" >> APPENDIX.md
-          echo "| \`DoWhileStirring.kt\` | \`do-while\` loop (taste first) | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Loops/DoWhile/DoWhileStirring.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          
-          echo "## Break/Continue" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`Break.kt\` | Stop loop entirely | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/BreakAndContinue/Break.kt) |" >> APPENDIX.md
-          echo "| \`Continue.kt\` | Skip one iteration | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/BreakAndContinue/Continue.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          
-          echo "## Null Safety" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`InputAndNullSafety.kt\` | User input & null safety | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/InputAndNullSafety/InputAndNullSafety.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          
-          echo "## Functions" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          echo "| Recipe | Description | Link |" >> APPENDIX.md
-          echo "|--------|-------------|------|" >> APPENDIX.md
-          echo "| \`BasicFunction.kt\` | Creating basic functions | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Functions/BasicFunction/BasicFunction.kt) |" >> APPENDIX.md
-          echo "| \`LambdaFunction.kt\` | Lambda expressions | [🔗 View](https://github.com/${{ github.repository }}/blob/main/src/kotlin/normal/Functions/LambdaFunction/LambdaFunction.kt) |" >> APPENDIX.md
-          echo "" >> APPENDIX.md
-          
+          # Statistics
           TOTAL=$(find src/kotlin/normal -name "*.kt" -type f | grep -v "introduction" | wc -l)
+          INTRO_COUNT=$(find src/kotlin/normal -name "introduction.md" -type f | wc -l)
           CATEGORIES=$(find src/kotlin/normal -mindepth 1 -maxdepth 1 -type d | wc -l)
           
           echo "## Statistics" >> APPENDIX.md
@@ -88,30 +114,37 @@ jobs:
           echo "| Metric | Value |" >> APPENDIX.md
           echo "|--------|-------|" >> APPENDIX.md
           echo "| 🍳 **Total Recipes** | \`$TOTAL\` |" >> APPENDIX.md
+          echo "| 📖 **Introductions** | \`$INTRO_COUNT\` |" >> APPENDIX.md
           echo "| 📁 **Categories** | \`$CATEGORIES\` |" >> APPENDIX.md
-          echo "| 🆕 **Last Updated** | $(date +'%Y-%m-%d') |" >> APPENDIX.md
+          echo "| 🆕 **Last Updated** | $(date +'%Y-%m-%d %H:%M:%S UTC') |" >> APPENDIX.md
           echo "" >> APPENDIX.md
           echo "---" >> APPENDIX.md
           echo "" >> APPENDIX.md
           echo "> *\"Bookmark this page - it's your complete Kotlin recipe collection!\"* 🚀" >> APPENDIX.md
-      
-      - name: Update README
-        run: |
-          # Remove old appendix section if exists
-          sed -i '/### 📖 Recipe Appendix/,/> 💡/d' README.md
           
-          # Add new appendix section with link
-          echo "" >> README.md
-          echo "### 📖 Recipe Appendix" >> README.md
-          echo "" >> README.md
-          echo "For a complete list of all recipes with direct links, check out the [**Full Recipe Appendix**](APPENDIX.md) 📚" >> README.md
-          echo "" >> README.md
-          echo "> 💡 **Tip:** The appendix contains every recipe organized by category with one-click access!" >> README.md
+          echo "✅ Generated APPENDIX.md with $TOTAL recipes"
+      
+      - name: Update README (insert appendix link at correct position)
+        run: |
+          # Remove old appendix section if exists (between markers)
+          sed -i '/<!-- APPENDIX_START -->/,/<!-- APPENDIX_END -->/d' README.md
+          
+          # Insert new appendix section before "Happy cooking"
+          sed -i '/\*\*Happy cooking! 👨‍🍳🍳\*\*/i\
+          <!-- APPENDIX_START -->\
+          ### 📖 Recipe Appendix\
+          \
+          For a complete list of all recipes with direct links and introductions, check out the [**Full Recipe Appendix**](APPENDIX.md) 📚\
+          \
+          > 💡 **Tip:** The appendix contains every recipe organized by category with one-click access and concept explanations!\
+          \
+          <!-- APPENDIX_END -->\
+          ' README.md
       
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "📚 docs: update recipe appendix [skip ci]"
+          commit_message: "📚 docs: auto-update recipe appendix [skip ci]"
           commit_user_name: "KotlinCookBot"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           file_pattern: "README.md APPENDIX.md"
