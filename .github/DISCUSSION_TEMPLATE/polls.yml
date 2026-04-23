@@ -1,12 +1,12 @@
 title: "Community Poll"
-labels: ["poll", "discussion"]
+labels: ["poll"]
 body:
   - type: markdown
     attributes:
       value: |
-        ## 📊 Community Poll
+        ## 📊 Create a Poll
         
-        Vote on what you'd like to see next in KotlinCookBook! 🍳
+        Fill out the form below to create a community poll. 🍳
         
         ---
   
@@ -14,36 +14,27 @@ body:
     id: question
     attributes:
       label: "❓ Poll Question"
-      placeholder: "What recipe should we add next?"
+      placeholder: "e.g., What recipe should we add next?"
     validations:
       required: true
   
   - type: textarea
-    id: context
-    attributes:
-      label: "📝 Context"
-      placeholder: "Why are we asking this? What will the results be used for?"
-    validations:
-      required: false
-  
-  - type: checkboxes
     id: options
     attributes:
-      label: "🔘 Vote for your choice"
-      description: "Select one or more options below"
-      options:
-        - label: "Option 1: Extension Functions"
-        - label: "Option 2: Sealed Classes"
-        - label: "Option 3: Coroutines"
-        - label: "Option 4: Flow API"
-        - label: "Option 5: Ktor"
+      label: "🔘 Options"
+      description: "One option per line"
+      placeholder: |
+        Extension Functions
+        Sealed Classes
+        Coroutines
+        Flow API
     validations:
       required: true
   
   - type: dropdown
     id: duration
     attributes:
-      label: "⏰ Poll Duration"
+      label: "⏰ Duration"
       options:
         - "3 days"
         - "7 days"
@@ -52,10 +43,10 @@ body:
     validations:
       required: true
   
-  - type: checkboxes
-    id: guidelines
+  - type: textarea
+    id: additional
     attributes:
-      label: "📋 Guidelines"
-      options:
-        - label: "This poll is for gathering community feedback"
-          required: true
+      label: "📝 Additional Context (optional)"
+      placeholder: "Any extra information about this poll..."
+    validations:
+      required: false
