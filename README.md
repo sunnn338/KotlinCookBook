@@ -80,16 +80,17 @@ For detailed setup instructions, see [InstallAndSetup.md](https://github.com/rea
 | `WhileLoop.kt` | `while` & `do-while` (automatic stirrer) | 🍜 Beginner | ✅ Done |
 | `Break.kt` | Control your loops (stop) | 🍜 Beginner | ✅ Done |
 | `Continue.kt` | Control your loops (skip) | 🍜 Beginner | ✅ Done |
+| `InputAndNullSafety.kt` | User input & null safety (?. ?: let) | 🍜 Beginner | ✅ Done |
 
 ### Coming Soon 🔜
 
 | Recipe | What you'll learn | Level |
 |--------|-------------------|-------|
 | `Functions.kt` | Creating your own recipes | 🍜 Beginner |
-| `NullSafety.kt` | Handling empty ingredients safely | 🍜 Beginner |
 | `Collections.kt` | List, Set, Map (your pantry) | 🥘 Intermediate |
 | `Lambdas.kt` | Cooking with shortcuts | 🥘 Intermediate |
 | `Classes.kt` | Building your own kitchen tools | 🥘 Intermediate |
+| `ScopeFunctions.kt` | let, run, with, apply, also | 🥘 Intermediate |
 
 ---
 
