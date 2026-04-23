@@ -26,45 +26,19 @@ body:
     validations:
       required: false
   
-  - type: dropdown
-    id: option1
+  - type: checkboxes
+    id: options
     attributes:
-      label: "🔘 Option 1"
-      placeholder: "e.g., Extension Functions"
+      label: "🔘 Vote for your choice"
+      description: "Select one or more options below"
+      options:
+        - label: "Option 1: Extension Functions"
+        - label: "Option 2: Sealed Classes"
+        - label: "Option 3: Coroutines"
+        - label: "Option 4: Flow API"
+        - label: "Option 5: Ktor"
     validations:
       required: true
-  
-  - type: dropdown
-    id: option2
-    attributes:
-      label: "🔘 Option 2"
-      placeholder: "e.g., Sealed Classes"
-    validations:
-      required: true
-  
-  - type: dropdown
-    id: option3
-    attributes:
-      label: "🔘 Option 3 (optional)"
-      placeholder: "e.g., Coroutines"
-    validations:
-      required: false
-  
-  - type: dropdown
-    id: option4
-    attributes:
-      label: "🔘 Option 4 (optional)"
-      placeholder: "e.g., Flow API"
-    validations:
-      required: false
-  
-  - type: dropdown
-    id: option5
-    attributes:
-      label: "🔘 Option 5 (optional)"
-      placeholder: "e.g., Ktor"
-    validations:
-      required: false
   
   - type: dropdown
     id: duration
