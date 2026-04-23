@@ -1,4 +1,4 @@
-title: "Help Wanted 🤝"
+title: "Help Wanted"
 labels: ["help", "question"]
 body:
   - type: markdown
@@ -43,8 +43,6 @@ body:
         - "🟡 Still stuck"
         - "🟢 Resolved (will share solution)"
         - "🔴 Blocked"
-    validations:
-      required: false
   
   - type: checkboxes
     id: guidelines
@@ -52,6 +50,4 @@ body:
       label: "📋 Guidelines"
       options:
         - label: "I have searched existing discussions before posting"
-          required: true
-        - label: "I have included relevant code/error messages"
           required: true
