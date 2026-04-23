@@ -1,0 +1,87 @@
+title: "Community Poll"
+labels: ["poll", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📊 Community Poll
+        
+        Vote on what you'd like to see next in KotlinCookBook! 🍳
+        
+        ---
+  
+  - type: input
+    id: question
+    attributes:
+      label: "❓ Poll Question"
+      placeholder: "What recipe should we add next?"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: context
+    attributes:
+      label: "📝 Context"
+      placeholder: "Why are we asking this? What will the results be used for?"
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: option1
+    attributes:
+      label: "🔘 Option 1"
+      placeholder: "e.g., Extension Functions"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: option2
+    attributes:
+      label: "🔘 Option 2"
+      placeholder: "e.g., Sealed Classes"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: option3
+    attributes:
+      label: "🔘 Option 3 (optional)"
+      placeholder: "e.g., Coroutines"
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: option4
+    attributes:
+      label: "🔘 Option 4 (optional)"
+      placeholder: "e.g., Flow API"
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: option5
+    attributes:
+      label: "🔘 Option 5 (optional)"
+      placeholder: "e.g., Ktor"
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: duration
+    attributes:
+      label: "⏰ Poll Duration"
+      options:
+        - "3 days"
+        - "7 days"
+        - "14 days"
+        - "30 days"
+    validations:
+      required: true
+  
+  - type: checkboxes
+    id: guidelines
+    attributes:
+      label: "📋 Guidelines"
+      options:
+        - label: "This poll is for gathering community feedback"
+          required: true
