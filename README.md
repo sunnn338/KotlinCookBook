@@ -76,22 +76,42 @@ For detailed setup instructions, see [InstallAndSetup.md](https://github.com/rea
 | `DataTypes.kt` | Int, Char, String, Float, Double | 🍜 Beginner | ✅ Done |
 | `IfChef.kt` | `if` and `else` (making decisions) | 🍜 Beginner | ✅ Done |
 | `WhenChef.kt` | `when` expression (the spice rack) | 🍜 Beginner | ✅ Done |
-| `ForLoop.kt` | `for` loop (batch cooking) | 🍜 Beginner | ✅ Done |
-| `WhileLoop.kt` | `while` & `do-while` (automatic stirrer) | 🍜 Beginner | ✅ Done |
+| `ForStirring.kt` | `for` loop (batch cooking) | 🍜 Beginner | ✅ Done |
+| `WhileStirring.kt` | `while` loop (automatic stirrer) | 🍜 Beginner | ✅ Done |
+| `DoWhileStirring.kt` | `do-while` loop (taste first) | 🍜 Beginner | ✅ Done |
 | `Break.kt` | Control your loops (stop) | 🍜 Beginner | ✅ Done |
 | `Continue.kt` | Control your loops (skip) | 🍜 Beginner | ✅ Done |
-| `InputAndNullSafety.kt` | User input & null safety (?. ?: let) | 🍜 Beginner | ✅ Done |
+| `InputAndNullSafety.kt` | User input & null safety | 🍜 Beginner | ✅ Done |
+| `BasicFunction.kt` | Creating basic functions | 🍜 Beginner | ✅ Done |
+| `LambdaFunction.kt` | Lambda expressions | 🥘 Intermediate | ✅ Done |
 
-### Coming Soon 🔜
+### 📖 Recipe Appendix
 
-| Recipe | What you'll learn | Level |
-|--------|-------------------|-------|
-| `Functions.kt` | Creating your own recipes | 🍜 Beginner |
-| `Collections.kt` | List, Set, Map (your pantry) | 🥘 Intermediate |
-| `Lambdas.kt` | Cooking with shortcuts | 🥘 Intermediate |
-| `Classes.kt` | Building your own kitchen tools | 🥘 Intermediate |
-| `ScopeFunctions.kt` | let, run, with, apply, also | 🥘 Intermediate |
+For quick access, here are direct links to all recipes:
 
+| Category | Recipe | Direct Link |
+|----------|--------|-------------|
+| **Getting Started** | HelloWorld.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/GettingStarted/HelloWorld.kt) |
+| **Variables** | CommonVariables.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Variables/CommonVariables.kt) |
+| | ImmutableVariables.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Variables/ImmutableVariables.kt) |
+| | MutableVariables.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Variables/MutableVariables.kt) |
+| | StringSplitter.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Variables/WorkWithIt/StringSplitter.kt) |
+| | StringSplitterv2.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Variables/WorkWithIt/StringSplitterv2.kt) |
+| **If/When** | IfChef.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/IfChef/IfChef.kt) |
+| | WhenChef.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/WhenChef/WhenChef.kt) |
+| **Loops** | ForStirring.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Loops/For/ForStirring.kt) |
+| | WhileStirring.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Loops/While/WhileStirring.kt) |
+| | DoWhileStirring.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Loops/DoWhile/DoWhileStirring.kt) |
+| **Break/Continue** | Break.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/BreakAndContinue/Break.kt) |
+| | Continue.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/BreakAndContinue/Continue.kt) |
+| **Null Safety** | InputAndNullSafety.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/InputAndNullSafety/InputAndNullSafety.kt) |
+| **Functions** | BasicFunction.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Functions/BasicFunction/BasicFunction.kt) |
+| | LambdaFunction.kt | [🔗 View](https://github.com/realmg51-cpu/KotlinCookBook/blob/main/src/kotlin/normal/Functions/LambdaFunction/LambdaFunction.kt) |
+
+---
+
+> 💡 **Tip:** Click any [🔗 View] link to see the recipe source code directly on GitHub!
+> 
 ---
 
 ## 🚀 How to cook (run) these recipes
