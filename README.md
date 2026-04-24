@@ -123,53 +123,7 @@ Some recipes use `readln()` to get input from you. Just follow the prompts!
 
 ---
 
-<!-- STRUCTURE_START -->
-## 📁 Project Structure
 
-```
-src/kotlin/normal/
-├── BreakAndContinue/
-│   ├── Break.kt
-│   └── Continue.kt
-├── Funcions/
-│   └── BasicFuncions/
-│       └── BasicFuncion.kt
-├── GettingStarted/
-│   ├── HelloWorld.kt
-├── IfChef/
-│   └── IfChef.kt
-├── InputAndNullSafety/
-│   └── InputAndNullSafety.kt
-├── Loops/
-│   ├── Do-While/
-│   │   └── DoWhileStirring.kt
-│   ├── For/
-│   │   └── ForStirring.kt
-│   └── While/
-│       └── WhileStirring.kt
-├── Variables/
-│   ├── WorkWithIt/
-│   │   ├── StringSplitter.kt
-│   │   └── StringSplitterv2.kt
-│   ├── CommonVariables.kt
-│   ├── ImmutableVariables.kt
-│   └── MutableVariables.kt
-└── WhenChef/
-    └── WhenChef.kt
-```
-
-## 📊 Statistics
-
-| Metric | Value |
-|--------|-------|
-| 🍳 **Total Recipes** | `15` Kotlin files |
-| 📁 **Categories** | `8` folders |
-| 🆕 **Latest update** | 2026-04-23 |
-
-<img src=".github/avatars/bot.svg" width="30">
-
-*Auto-updated: 2026-04-23 13:37:38 UTC*
-<!-- STRUCTURE_END -->
 
 ## 🤝 How to Contribute
 
@@ -314,6 +268,66 @@ For a complete list of all recipes, check out the [**Full Recipe Appendix**](APP
 
 > 💡 **Tip:** The appendix contains every recipe with direct links to source code!
 
+
+<!-- STRUCTURE_START -->
+## 📁 Project Structure
+
+```
+src/kotlin/normal
+├── BreakAndContinue
+│   ├── Break.kt
+│   └── Continue.kt
+├── Funcions
+│   └── BasicFuncions
+│       └── BasicFuncion.kt
+├── GettingStarted
+│   └── HelloWorld.kt
+├── IfChef
+│   └── IfChef.kt
+├── InputAndNullSafety
+│   └── InputAndNullSafety.kt
+├── Loops
+│   ├── Do-While
+│   │   └── DoWhileStirring.kt
+│   ├── For
+│   │   └── ForStirring.kt
+│   └── While
+│       └── WhileStirring.kt
+├── Variables
+│   ├── WorkWithIt
+│   │   ├── StringSplitter.kt
+│   │   └── StringSplitterv2.kt
+│   ├── CommonVariables.kt
+│   ├── ImmutableVariables.kt
+│   └── MutableVariables.kt
+└── WhenChef
+    └── WhenChef.kt
+
+14 directories, 15 files
+```
+
+### 📊 Statistics
+
+| Metric | Value |
+|--------|-------|
+| 🍳 **Total Recipes** | `15` files |
+| 📁 **Categories** | `8` folders |
+
+---
+
+<img src=".github/avatars/bot.svg" width="40">
+
+*Auto-updated by KotlinCookBot 🤖*
+*Last update: 2026-04-24 11:05:22 UTC*
+<!-- STRUCTURE_END -->
+
+### 📖 Recipe Appendix
+
+For a complete list of all recipes with code and introduction links, check out the [**Full Recipe Appendix**](APPENDIX.md) 📚
+
+> 💡 **Tip:** Each recipe includes a direct link to the code file and introduction (if available)!
+
+<!-- APPENDIX_END -->
 
 **Happy cooking! 👨‍🍳🍳**
 
