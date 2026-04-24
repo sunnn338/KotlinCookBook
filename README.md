@@ -258,15 +258,6 @@ Have questions? Suggestions? Want to share your own recipe?
 ---
 
 
-### 📖 Recipe Appendix
-
-
-
-For a complete list of all recipes, check out the [**Full Recipe Appendix**](APPENDIX.md) 📚
-
-
-
-> 💡 **Tip:** The appendix contains every recipe with direct links to source code!
 
 
 <!-- STRUCTURE_START -->
@@ -318,7 +309,7 @@ src/kotlin/normal
 <img src=".github/avatars/bot.svg" width="40">
 
 *Auto-updated by KotlinCookBot 🤖*
-*Last update: 2026-04-24 11:05:22 UTC*
+*Last update: 2026-04-24 11:32:55 UTC*
 <!-- STRUCTURE_END -->
 
 ### 📖 Recipe Appendix
